@@ -1,6 +1,4 @@
 use dialoguer::{theme::ColorfulTheme, Input};
-use std::{collections::HashMap, cmp::Eq};
-
 
 #[derive(Debug)]
 struct PasswordComponent {
@@ -23,26 +21,9 @@ impl PasswordComponent {
 
 
 fn main() {
-    let pw_count: String = Input::with_theme(&ColorfulTheme::default())
-        .with_prompt("How many passwords do you want to generate?")
-        .default("1".to_string())
-        .validate_with(|input: &String| -> Result<(), &str> {
-            let mut numeric = true;
-            for c in input.chars() {
-                if !c.is_numeric() {
-                    numeric = false;
-                    break;
-                }
-            }
-            if numeric {
-                Ok(())
-            } else {
-                Err("Please enter a number!")
-            }
-        })
-        .interact_text()
-        .unwrap();
 
+    let pw_count = prompt_number("How many passwords do you want to generate?", 1);
+    let pw_length = prompt_number("How long do you want your password(s) to be?", 10);
 
     let mut components = [
         PasswordComponent::new(
@@ -71,6 +52,31 @@ fn main() {
         component.include = prompt_yes_or_no(&component, None, None);
     }
 }
+
+
+fn prompt_number(prompt: &str, default: u32) -> u32 {
+    let number: String = Input::with_theme(&ColorfulTheme::default())
+        .with_prompt(prompt)
+        .default(default.to_string())
+        .validate_with(|input: &String| -> Result<(), &str> {
+            let mut numeric = true;
+            for c in input.chars() {
+                if !c.is_numeric() {
+                    numeric = false;
+                    break;
+                }
+            }
+            if numeric {
+                Ok(())
+            } else {
+                Err("Please enter a number!")
+            }
+        })
+        .interact_text()
+        .unwrap();
+    number.parse::<u32>().unwrap()  // Will never panic since number is verified if it is numeric
+}
+
 
 fn prompt_yes_or_no(password_component: &PasswordComponent, positive: Option<Vec<&str>>, negative: Option<Vec<&str>>) -> bool {
 
