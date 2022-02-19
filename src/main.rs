@@ -38,7 +38,7 @@ fn main() {
         ),
         PasswordComponent::new(
             "Include numbers (0-9)?".to_string(),
-            "!”#$%&()*+,-./:;<=>?@[\\]^_`{|}~".chars().collect(),
+            "0123456789".chars().collect(),
             Some(true)  
         ),
         PasswordComponent::new(
