@@ -22,28 +22,32 @@ fn main() {
         .unwrap();
 
 
-    let lowercase_alpha = prompt_yes_or_no("Include a-z?", None, None);
+    let lowercase_alpha = prompt_yes_or_no("Include a-z?", None, None, None);           // no default
+    let test = prompt_yes_or_no("Include a-z?", None, None, Some(""));     // Default
 }
 
-fn prompt_yes_or_no(prompt: &str, positive: Option<Vec<&str>>, negative: Option<Vec<&str>>) -> bool {
+fn prompt_yes_or_no(prompt: &str, positive: Option<Vec<&str>>, negative: Option<Vec<&str>>, default: Option<&str>) -> bool {
 
     let positive = positive.unwrap_or(vec!["yes", "y"]);
     let negative = negative.unwrap_or(vec!["no", "n"]);
 
-    println!("{:#?}", positive);
+    let theme = &ColorfulTheme::default();
+    let mut input = Input::with_theme(theme);
+    input.with_prompt(format!("{} [y/n]", prompt));
+    input.validate_with(|input: &String| -> Result<(), &str> {
+        let i = input.to_lowercase();
+        if positive.contains(&i.as_str()) || negative.contains(&i.as_str()) {
+            Ok(())
+        } else {
+            Err("Please enter \"y\" or \"n\"!")
+        }
+    });
 
-    let answer: String = Input::with_theme(&ColorfulTheme::default())
-        .with_prompt(format!("{} [y/n]", prompt))
-        .validate_with(|input: &String| -> Result<(), &str> {
-            let i = input.to_lowercase();
-            if positive.contains(&i.as_str()) || negative.contains(&i.as_str()) {
-                Ok(())
-            } else {
-                Err("Please enter \"y\" or \"n\"!")
-            }
-        })
-        .interact_text()
-        .unwrap();
+    if let Some(default_value) = default {
+        input.default(default_value.to_string());
+    }
+
+    let answer: String = input.interact_text().unwrap();
 
     if positive.contains(&answer.as_str()) {
         true
