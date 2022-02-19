@@ -54,10 +54,19 @@ fn main() {
             "Include uppercase alphabet (A-Z)?".to_string(),
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ".chars().collect(),
             Some(true)
+        ),
+        PasswordComponent::new(
+            "Include numbers (0-9)?".to_string(),
+            "!”#$%&()*+,-./:;<=>?@[\\]^_`{|}~".chars().collect(),
+            Some(true)  
+        ),
+        PasswordComponent::new(
+            "Include symbols (e.g. @#$%)?".to_string(),
+            "!”#$%&()*+,-./:;<=>?@[\\]^_`{|}~".chars().collect(),
+            Some(false)
         )
     ];
 
-    
     for component in &mut components {
         component.include = prompt_yes_or_no(&component, None, None);
     }
