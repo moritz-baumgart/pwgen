@@ -1,10 +1,24 @@
 use dialoguer::{theme::ColorfulTheme, Input};
+use std::{collections::HashMap, cmp::Eq};
 
 
+#[derive(Debug)]
 struct PasswordComponent {
     prompt: String,
     characters: Vec<char>,
-    default: Option<bool>
+    default: Option<bool>,
+    include: bool
+}
+
+impl PasswordComponent {
+    fn new(prompt: String, characters: Vec<char>, default: Option<bool>,) -> PasswordComponent {
+        PasswordComponent {
+            prompt,
+            characters,
+            default,
+            include: false
+        }
+    }
 }
 
 
@@ -30,17 +44,23 @@ fn main() {
         .unwrap();
 
 
-    let test1 = prompt_yes_or_no(&PasswordComponent {
-        prompt: "Test 1 ".to_string(),
-        characters: vec!['a', 'b', 'c'],
-        default: None                                           // no default
-    }, None, None);
+    let mut components = [
+        PasswordComponent::new(
+            "Include lowercase alphabet (a-z)?".to_string(),
+            "abcdefghijklmnopqrstuvwxyz".chars().collect(),
+            Some(true)
+        ),
+        PasswordComponent::new(
+            "Include uppercase alphabet (A-Z)?".to_string(),
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ".chars().collect(),
+            Some(true)
+        )
+    ];
 
-    let test2 = prompt_yes_or_no(&PasswordComponent {
-        prompt: "Test 2".to_string(),
-        characters: vec!['1', '2', '3'],
-        default: Some(true)                                           // yes as default
-    }, None, None);
+    
+    for component in &mut components {
+        component.include = prompt_yes_or_no(&component, None, None);
+    }
 }
 
 fn prompt_yes_or_no(password_component: &PasswordComponent, positive: Option<Vec<&str>>, negative: Option<Vec<&str>>) -> bool {
