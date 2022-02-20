@@ -1,4 +1,5 @@
 use dialoguer::{theme::ColorfulTheme, Input};
+use rand::{thread_rng, seq::SliceRandom};
 
 #[derive(Debug)]
 struct PasswordComponent {
@@ -50,6 +51,33 @@ fn main() {
 
     for component in &mut components {
         component.include = prompt_yes_or_no(&component, None, None);
+    }
+
+    println!();
+    if pw_count > 1 {
+        println!("Here are your passwords:");
+    } else {
+        println!("Here is your password:");
+    }
+    println!();
+
+    let mut rng = thread_rng();
+    let mut all_components = Vec::new();
+
+    for component in components {
+        if component.include {
+            all_components.extend(component.characters);
+        }
+    }
+
+    for _ in 0..pw_count {
+        let mut password = "".to_string();
+
+        for _ in 0..pw_length {
+            password.push(*all_components.choose(&mut rng).unwrap());
+        }
+
+        println!("{}", password);
     }
 }
 
