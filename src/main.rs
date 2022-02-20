@@ -6,7 +6,6 @@ struct PasswordComponent {
     prompt: String,
     characters: Vec<char>,
     default: Option<bool>,
-    include: bool
 }
 
 impl PasswordComponent {
@@ -15,7 +14,6 @@ impl PasswordComponent {
             prompt,
             characters,
             default,
-            include: false
         }
     }
 }
@@ -26,7 +24,7 @@ fn main() {
     let pw_count = prompt_number("How many passwords do you want to generate?", 1);
     let pw_length = prompt_number("How long do you want your password(s) to be?", 10);
 
-    let mut components = [
+    let components = [
         PasswordComponent::new(
             "Include lowercase alphabet (a-z)?".to_string(),
             "abcdefghijklmnopqrstuvwxyz".chars().collect(),
@@ -49,8 +47,12 @@ fn main() {
         )
     ];
 
-    for component in &mut components {
-        component.include = prompt_yes_or_no(&component, None, None);
+    let mut all_chars = Vec::new();
+
+    for component in components {
+        if prompt_yes_or_no(&component, None, None) {
+            all_chars.extend(component.characters);
+        }
     }
 
     println!();
@@ -61,20 +63,14 @@ fn main() {
     }
     println!();
 
+
     let mut rng = thread_rng();
-    let mut all_components = Vec::new();
-
-    for component in components {
-        if component.include {
-            all_components.extend(component.characters);
-        }
-    }
-
+    
     for _ in 0..pw_count {
         let mut password = "".to_string();
 
         for _ in 0..pw_length {
-            password.push(*all_components.choose(&mut rng).unwrap());
+            password.push(*all_chars.choose(&mut rng).unwrap());
         }
 
         println!("{}", password);
